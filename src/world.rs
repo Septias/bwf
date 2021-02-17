@@ -7,11 +7,8 @@ struct Plane {
     z: u32
 }
 
-
 pub fn create_planes(world: &mut World, width: u32, depth: u32){
-
     let mut planes = Vec::with_capacity((width * depth) as usize);
-
     for x in 0..width {
         for z in 0..depth {
             planes.push( (Plane{x, z}, ));
@@ -35,4 +32,9 @@ pub fn create_trees(world: &mut World){
     for tree in trees {
         world.entry(tree.0).unwrap().add_component( Tree {height: 3})
     }
-} 
+}
+
+
+pub fn create_world(){
+
+}
