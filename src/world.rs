@@ -21,11 +21,18 @@ pub fn create_planes(world: &mut World, width: u32, depth: u32){
     world.extend(planes);
 }
 
+struct Tree{
+    height: u8
+}
+
 pub fn create_trees(world: &mut World){
     let mut query = <(Entity, &Plane)>::query();
     let noise = Perlin::new();
-    
-    for (entity, plane) in query.iter_mut(world) {
-        entity.add_component();
+    let trees: Vec<(Entity, f64)> = query.iter_mut(world)
+        .map(|chunk| (chunk.0.clone(), noise.get([chunk.1.x as f64, chunk.1.z as f64])))
+        .filter(|chunk| chunk.1.gt(&0.5)).collect();
+
+    for tree in trees {
+        world.entry(tree.0).unwrap().add_component( Tree {height: 3})
     }
 } 
