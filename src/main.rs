@@ -33,8 +33,8 @@ fn main() -> amethyst::Result<()> {
     let bwf_config = BwfConfig::load("config/config.ron")?;
 
     // create game_data with GameDatabuilder
-    let game_data = DispatcherBuilder::default()
-        .add_bundle(InputBundle::new().with_bindings_from_file(&input_dir)?)
+    let mut game_data = DispatcherBuilder::default();
+    game_data.add_bundle(InputBundle::new().with_bindings_from_file(&input_dir)?)
         .add_bundle(TransformBundle::default())
         //.with_bundle(MinionsBundle)?
         .add_bundle(
@@ -47,7 +47,7 @@ fn main() -> amethyst::Result<()> {
                 )
                 .with_plugin(RenderShaded3D::default()),
         );
-    let mut game = Application::build(assets_dir, Bwf::default())?
+    let game = Application::build(assets_dir, Bwf::default())?
         .with_frame_limit(
             FrameRateLimitStrategy::SleepAndYield(Duration::from_millis(2)),
             144,

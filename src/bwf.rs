@@ -110,7 +110,7 @@ fn initialize_camera(world: &mut World, resources: &mut Resources) {
     let camera = Camera::perspective(1.3, 1.0271975512, 0.1);
 
 
-    world.extend(vec![vec![camera, transform]]);
+    world.extend(vec![(camera, transform)]);
 }
 
 fn initialize_light(world: &mut World) {

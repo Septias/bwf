@@ -34,17 +34,9 @@ pub struct FwdWorld{
 }
 
 
-fn test(){
-
-    let world = World::default();
-
-    let components: Box< dyn Component> = Box::new(Tree{height: 3});
-
-}
-
 impl FwdWorld {
-    fn with_trees(self, noise: impl NoiseFn<[f64; 2]> ) -> Self {
-        self.planes.iter().for_each(|planeinfo| {
+    fn with_trees(mut self, noise: impl NoiseFn<[f64; 2]> ) -> Self {
+        self.planes.iter_mut().for_each(|planeinfo| {
             if noise.get([planeinfo.0.x as f64, planeinfo.0.z as f64]) > 0.5 {
                 planeinfo.1 = PlaneType::Tree(Tree { height: 3});
             };
@@ -72,4 +64,4 @@ impl FwdWorld {
             .collect::<Vec<_>>();
         world.extend(trees);
     }
-}
+}   
