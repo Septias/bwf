@@ -16,7 +16,7 @@ pub struct CameraConfig {
 }
 
 #[derive(Debug, Default, Deserialize, Serialize)]
-pub struct MinionsConfig {
+pub struct BwfConfig {
     pub arena: ArenaConfig,
     pub camera: CameraConfig,
 }

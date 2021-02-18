@@ -1,5 +1,5 @@
-use amethyst::prelude::*;
-use noise::{NoiseFn, Perlin};
+use amethyst::{ecs::storage::Component, prelude::*};
+use noise::{NoiseFn};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 struct Plane {
@@ -7,34 +7,69 @@ struct Plane {
     z: u32
 }
 
-pub fn create_planes(world: &mut World, width: u32, depth: u32){
-    let mut planes = Vec::with_capacity((width * depth) as usize);
-    for x in 0..width {
-        for z in 0..depth {
-            planes.push( (Plane{x, z}, ));
-        } 
-    }
-
-    world.extend(planes);
-}
-
+#[derive(PartialEq)]
 struct Tree{
     height: u8
 }
 
-pub fn create_trees(world: &mut World){
-    let mut query = <(Entity, &Plane)>::query();
-    let noise = Perlin::new();
-    let trees: Vec<(Entity, f64)> = query.iter_mut(world)
-        .map(|chunk| (chunk.0.clone(), noise.get([chunk.1.x as f64, chunk.1.z as f64])))
-        .filter(|chunk| chunk.1.gt(&0.5)).collect();
+#[derive(PartialEq)]
+enum PlaneType {
+    Tree(Tree),
+    Plane(Plane),
+    None
+}
 
-    for tree in trees {
-        world.entry(tree.0).unwrap().add_component( Tree {height: 3})
+impl PlaneType {
+    fn as_tree(self) -> Option<Tree>{
+        if let Self::Tree(tree) = self {
+            Some(tree)
+        } else {
+            None
+        }
     }
 }
 
+pub struct FwdWorld{
+    planes: Vec<(Plane, PlaneType)>
+}
 
-pub fn create_world(){
 
+fn test(){
+
+    let world = World::default();
+
+    let components: Box< dyn Component> = Box::new(Tree{height: 3});
+
+}
+
+impl FwdWorld {
+    fn with_trees(self, noise: impl NoiseFn<[f64; 2]> ) -> Self {
+        self.planes.iter().for_each(|planeinfo| {
+            if noise.get([planeinfo.0.x as f64, planeinfo.0.z as f64]) > 0.5 {
+                planeinfo.1 = PlaneType::Tree(Tree { height: 3});
+            };
+        });
+        self
+    }
+
+    pub fn new(width: u32, depth: u32) -> Self{
+        let mut planes = Vec::with_capacity((width * depth) as usize);
+        for x in 0..width {
+            for z in 0..depth {
+                planes.push((Plane{x, z}, PlaneType::None));
+            } 
+        }
+        
+        FwdWorld {
+            planes
+        }
+    }
+
+    pub fn build(self, world: &mut World){
+        let trees = self.planes
+            .drain_filter(|planeinfo| planeinfo.1.as_tree().is_some())
+            .map(|planeinfo| (planeinfo.0, planeinfo.1.as_tree().unwrap()))
+            .collect::<Vec<_>>();
+        world.extend(trees);
+    }
 }
