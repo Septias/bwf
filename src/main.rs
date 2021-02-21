@@ -57,5 +57,6 @@ fn main() -> amethyst::Result<()> {
         .build(game_data)?;
 
     game.run();
+    
     Ok(())
 }
